@@ -191,12 +191,12 @@ class DB:
 
     def add_comment(self,id_post,id_user,text,id_parent_comment=0):
         try:
-            self.cursor.execute(f"insert into comments (id_post,id_user,text,rating) VAlUES({id_post},{id_user},'{text}',0) ;")
+            self.cursor.execute(f"insert into comments (id_post,id_user,text,rating) VAlUES({id_post},{id_user},'{text}',0) RETURNING id;")
             self.connect.commit()
+            last_id = self.cursor.fetchone()[0]
         except (Exception, psycopg2.Error) as error:
             self.connect.rollback()
             print("Error in add_comment() first step:", error)
-        last_id =self.cursor.fetchone()[0]
         if id_parent_comment!=0:
             try:
                 self.cursor.execute(f"Select * from parent_comments where id_child={id_parent_comment} ")
@@ -243,7 +243,7 @@ class DB:
             self.connect.rollback()
             print("Error in subscribe() first step:", error)
         try:
-            self.cursor.execute(f"insert into subscription (id_user,id_subscriber) VAlUES('{id_user}',{id_subscriber} ;")
+            self.cursor.execute(f"insert into subscription (id_user,id_subscriber) VAlUES('{id_user}',{id_subscriber}) ;")
             self.connect.commit()
         except (Exception, psycopg2.Error) as error:
             self.connect.rollback()
@@ -291,15 +291,16 @@ class DB:
         try:
             self.cursor.execute(f"delete from parent_comments where id_parent='{id}' or id_child='{id}'")
             self.connect.commit()
-            if not self.cursor.fetchall():
-                return "Can`t delete comment"
         except (Exception, psycopg2.Error) as error:
             self.connect.rollback()
             print("Error in remove_comment() first step:", error)
         try:
             self.cursor.execute(f"delete from comments where id='{id}'")
             self.connect.commit()
-            return "Delete is successful"
+            if self.cursor.rowcount:
+                return "Delete is successful"
+            else:
+                return "Can`t delete"
         except (Exception, psycopg2.Error) as error:
             self.connect.rollback()
             print("Error in remove_comment() second step:", error)
@@ -319,7 +320,7 @@ class DB:
         try:
             self.cursor.execute(f"delete from posts where id='{id}'")
             self.connect.commit()
-            if not self.cursor.fetchall():
+            if not self.cursor.rowcount:
                 return "Can`t delete post"
         except (Exception, psycopg2.Error) as error:
             self.connect.rollback()
@@ -350,7 +351,7 @@ class DB:
         try:
             self.cursor.execute(f"delete from users where id='{id}'")
             self.connect.commit()
-            if self.cursor.fetchall():
+            if self.cursor.rowcount:
                 return "Delete is correct"
             else:
                 return "Can`t delete"
@@ -383,14 +384,15 @@ class DB:
         return users
 
     def find_admin_count_comment_name(self,admin,count,name):
-        posts=0
         try:
             if admin:
                 self.cursor.execute(f"select * from posts natural join(select id_post as id from comments natural join (select id as id_post from posts natural join(select id as id_user from users where admin IS NOT NULL)t1)t2 group by id_post having count(id)>'{count}')t3  WHERE name LIKE '%{name}%'")
+                self.connect.commit()
+                posts = self.cursor.fetchall()
             else:
-                self.cursor.execute(f"select * from posts natural join(select id_post as id from comments natural join (select id as id_post from posts natural join(select id as id_user from users where admin IS NOT NULL)t1)t2 group by id_post having count(id)>'{count}')t3  WHERE name LIKE '%{name}%'")
-            self.connect.commit()
-            posts=self.cursor.fetchall()
+                self.cursor.execute(f"select * from posts natural join(select id_post as id from comments natural join (select id as id_post from posts natural join(select id as id_user from users where admin IS NULL)t1)t2 group by id_post having count(id)>'{count}')t3  WHERE name LIKE '%{name}%'")
+                self.connect.commit()
+                posts = self.cursor.fetchall()
             if not posts:
                 return "Can`t find"
         except (Exception, psycopg2.Error) as error:
@@ -400,7 +402,7 @@ class DB:
     
     def find_post_count_sub_com_rat_theme(self,sub,rating,theme):
         try:
-            self.cursor.execute(f"select * from posts natural join (select distinct id_post as id from comments natural join (select id_user from subscription group by id_user having count(id_subscriber)>'{sub}')t1 where rating >'{rating}')t2 where theme like '{theme}'")
+            self.cursor.execute(f"select * from posts natural join (select distinct id_post as id from comments natural join (select id_user from subscription group by id_user having count(id_subscriber)>'{sub}')t1 where rating >'{rating}')t2 where theme like '%{theme}%'")
             self.connect.commit()
             posts = self.cursor.fetchall()
             if not posts:

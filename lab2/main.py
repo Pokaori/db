@@ -119,7 +119,7 @@ while choice!='33':
         view.print_correct(mes)
     if choice == '16':
         comment = view.add_comment()
-        mes = database.add_comment(user["id_post"], user["id_user"], user["text"],  user["id_parent_comment"])
+        mes = database.add_comment(comment["id_post"], comment["id_user"], comment["text"],  comment["id_parent_comment"])
         view.print_correct(mes)
     if choice == '17':
         id=view.get_subscribe()
@@ -210,21 +210,19 @@ while choice!='33':
     if choice == '28':
         number=view.get_number_generate()
         start = time.time()
-        mes=database.generate_comments(number)
+        database.generate_comments(number)
         finish=time.time()
         dif2 = str(finish - start)
-        print(type(dif2))
-        dif = mes + "   time:" + dif2
+        dif ="time:" + dif2
         view.print_correct(dif)
 
     if choice == '29':
         number = view.get_number_generate()
         start = time.time()
-        mes = database.generate_users(number)
+        database.generate_users(number)
         finish = time.time()
         dif2 = str(finish - start)
-        print(type(dif2))
-        dif = mes + "   time:" + dif2
+        dif = "time:" + dif2
         view.print_correct(dif)
     if choice == '30':
         number = view.get_number_generate()
@@ -232,27 +230,24 @@ while choice!='33':
         mes = database.generate_subscription(number)
         finish = time.time()
         dif2 = str(finish - start)
-        print(type(dif2))
-        dif = mes + "   time:" + dif2
+        dif = mes + "time:" + dif2
         view.print_correct(dif)
     if choice == '31':
         number = view.get_number_generate()
         start = time.time()
-        mes = database.generate_parent_comments(number)
+        database.generate_parent_comments(number)
         finish = time.time()
         dif2 = str(finish - start)
-        print(type(dif2))
-        dif = mes + "   time:" + dif2
+        dif ="time:" + dif2
         view.print_correct(dif)
     if choice == '32':
         number = view.get_number_generate()
         start = time.time()
-        mes = database.generate_posts(number)
+        database.generate_posts(number)
         view.print_correct(mes)
         finish = time.time()
         dif2 = str(finish - start)
-        print(type(dif2))
-        dif = mes+ "   time:" + dif2
+        dif = "time:" + dif2
         view.print_correct(dif)
 
 

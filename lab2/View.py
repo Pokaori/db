@@ -90,13 +90,6 @@ class View:
         post["text"]=input("Enter text:")
         while True:
             try:
-                post["rating"]=int(input("Enter rating:"))
-            except ValueError:
-                print("You should enter integer. Try again")
-                continue
-            break
-        while True:
-            try:
                 post["id_user"]=int(input("Enter id_user:"))
                 if post["id_user"]<1:
                     print("You must enter positive integer. Try again")
@@ -119,13 +112,6 @@ class View:
     def add_comment(self):
         comment = {}
         comment["text"] = input("Enter text:")
-        while True:
-            try:
-                comment["rating"]=int(input("Enter rating:"))
-            except ValueError:
-                print("You should enter integer. Try again")
-                continue
-            break
         while True:
             try:
                 comment["id_post"]=int(input("Enter id_post:"))
@@ -215,12 +201,15 @@ class View:
         post={}
         post["name"]=input("Enter name: ")
         while True:
-            try:
-                post["admin"]=bool(input("Enter admin True or False:"))
-            except ValueError:
+            post["admin"]=input("Enter admin True or False:")
+            if(post["admin"]!="True" and post["admin"]!="False"):
                 print("You should enter boolean. Try again")
                 continue
             break
+        if(post["admin"]=="True"):
+            post["admin"]=True
+        else:
+            post["admin"]=False
         while True:
             try:
                 post["count"]=int(input("Enter count of comments:"))
