@@ -30,7 +30,7 @@ class User(Base):
     status = Column(Text)
     admin = Column(Text)
     comments=relationship("Comment", cascade="all, delete", backref="users")
-    posts = relationship("Post",passive_deletes=True, backref="users")
+    posts = relationship("Post",cascade="all, delete", backref="users")
     id_sub = relationship('User',
         secondary=subscription,
         primaryjoin=(subscription.c.id_user == id),

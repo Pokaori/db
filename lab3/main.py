@@ -120,6 +120,7 @@ while choice!='33':
         view.print_correct(mes)
     if choice == '16':
         comment = view.add_comment()
+
         mes = database.add_comment(comment["id_post"], comment["id_user"], comment["text"],  comment["id_parent_comment"])
         view.print_correct(mes)
     if choice == '17':

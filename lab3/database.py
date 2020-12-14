@@ -1,7 +1,5 @@
 import psycopg2
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, exc,and_,or_
+from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import sessionmaker
 from models import Post, User, Comment, parent_comments, subscription
 
@@ -49,7 +47,7 @@ class DB:
 
     def find_user_posts(self, id_user):
         try:
-            posts = self.s.query(Post).filter_by(id_user=id_user).all()
+            posts = self.s.query(User).get(id_user).posts
             self.s.commit()
             if posts:
                 return posts
@@ -442,3 +440,4 @@ class DB:
             self.s.rollback()
             print("Error in generate_posts():", error)
         return "Generated"
+
